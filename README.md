@@ -52,7 +52,7 @@ __requirements.txt__
 <pre>
 cardioviz/
 ├── app/
-│   ├── __init__.py
+│   ├── _init_.py
 │   ├── server.py        # Flask/FastAPI entrypoint
 │   ├── routes.py        # routing logic (API + pages)
 │   ├── controllers.py   # logic: load, validation, state, interactions
