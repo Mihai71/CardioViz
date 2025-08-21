@@ -1,16 +1,51 @@
 CardioViz Web — Exploratory & Clinical-Style Analytics for UCI Heart
+
+Exploratory and clinical-style analytics for the UCI Heart Disease dataset, delivered as a lightweight web app using NumPy, Pandas, Matplotlib, Flask/FastAPI, HTML/CSS/JS. No advanced ML — just transparent, reproducible analytics.
+
+Table of Contents
+
+User-Facing Features
+
+Data Loading
+
+Exploratory Visualizations (Matplotlib on Web UI)
+
+What-if (without ML)
+
+Export
+
+Out of Scope
+
+Dependencies & Setup
+
+Project Structure
+
+Technical Backbone (per module)
+
+dataio.py
+
+utils.py
+
+plots.py
+
+report.py
+
+server.py + routes.py
+
+Chronological Steps (Estimated Hours)
+
 User-Facing Features
 Data Loading
 
-Load dataset directly from UCI (via ucimlrepo) or from a local CSV (data/heart.csv).
+Load dataset directly from UCI (via ucimlrepo) or from a local CSV (heart.csv).
 
 Automatic validation of key columns: age, trestbps, chol, thalach, oldpeak, num.
 
-Exploratory Visualizations (Matplotlib rendered on web UI)
+Exploratory Visualizations (Matplotlib on Web UI)
 
-Class distribution (num: 0 = healthy, 1–4 = severity levels).
+Class distribution (num: 0 = healthy; 1–4 = severity levels).
 
-Histogram + boxplot (healthy vs. sick) for user-selected variables.
+Histogram + boxplot (healthy vs sick) for user-selected variables.
 
 Correlation matrix for selected variables.
 
@@ -44,9 +79,9 @@ Strictly NumPy, Pandas, Matplotlib, Flask/FastAPI, HTML/CSS/JS.
 
 Dependencies & Setup
 
-Python: 3.10+
+Python version: 3.10+
 
-Libraries
+Libraries:
 
 Core: numpy, pandas, matplotlib
 
@@ -58,7 +93,7 @@ Utilities: json, pathlib, argparse
 
 (Optional) openpyxl for .xlsx import
 
-requirements.txt
+Minimum versions (requirements.txt):
 
 numpy>=1.26
 pandas>=2.2
@@ -97,19 +132,19 @@ dataio.py
 
 load_from_uci() → ucimlrepo.fetch_ucirepo(id=45) → combine X + y.
 
-load_from_csv(path) → Pandas read_csv.
+load_from_csv(path) → pandas.read_csv.
 
 Validation of required columns.
 
-Create helper columns downstream: has_disease = (num > 0).astype(int) and age_bin (done in utils.py).
+Create helper columns: has_disease = (num > 0).astype(int) and age_bin.
 
 utils.py
 
 Functions for age_bin (≤50, 51–60, >60).
 
-Outcome labels mapping (0 → Healthy, 1–4 → Stage 1–4).
+NumPy percentile calculations.
 
-Summary tables (outcome distribution; disease rate by subgroup).
+Summary tables for outcomes.
 
 plots.py (each returns fig, ax, no global display)
 
@@ -133,7 +168,12 @@ server.py + routes.py
 
 Flask/FastAPI app.
 
-Endpoints: /, /plot, /export.
+Endpoints:
+
+/       # Home
+/plot   # Plot generation/selection
+/export # PDF/image export
+
 
 Templates rendered with Jinja2, charts embedded as PNGs.
 
@@ -141,7 +181,7 @@ Chronological Steps (Estimated Hours)
 
 Phase 0 — Documentation (5h)
 
-Create the project detailed documentation (LaTeX) and README.
+Create the project detailed documentation (LaTeX) and Readme file for the GIT repository.
 
 Phase 1 — Setup (2–3h)
 
