@@ -13,6 +13,12 @@ from app.figutils import save_png
 
 OUTDIR = Path("static/plots")
 
+THRESHOLDS = {
+    "chol": [200, 240],
+    "trestbps": [130, 140],
+    "oldpeak": [1.0, 2.0],
+}
+
 def get_df():
     csv = Path("data/heart.csv")
     df = load_from_csv(csv) if csv.exists() else load_from_uci()
