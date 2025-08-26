@@ -52,18 +52,20 @@ __requirements.txt__
 <pre>
 cardioviz/
 ├── app/
-│   ├── __init__.py
+│   ├── _init_.py
 │   ├── server.py        # Flask/FastAPI entrypoint
 │   ├── routes.py        # routing logic (API + pages)
 │   ├── controllers.py   # logic: load, validation, state, interactions
 │   ├── plots.py         # all matplotlib plotting functions
 │   ├── report.py        # PdfPages: build multi-page report
 │   ├── dataio.py        # load UCI/local, save session (JSON)
+│   ├── figutils.py      # figures generation
 │   └── utils.py         # binning, summary tables, outcome mapping
 ├── templates/           # HTML templates (Jinja2)
 │   ├── index.html
 │   └── plot.html
 ├── static/              # CSS, JS, generated PNGs
+│   ├──plots/
 ├── analysis/
 │   ├── notebooks/       # optional Jupyter for initial EDA
 │   └── figures/         # generated images
