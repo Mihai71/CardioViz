@@ -81,12 +81,13 @@ def plot_hist_overlay(
     normalize: str = "percent",  # "percent" sau "count"
     thresholds: list[float] | tuple[float, ...] | None = None,
     show_medians: bool = True,
+    patient_value: float | None = None,   # <-- nou
 ):
     """
     Histogramă suprapusă pentru `col`, separat pe healthy vs disease (has_disease).
-    - normalize="percent": Y în procente din fiecare grup (comparabil ca formă)
-      (folosim weights pentru a evita density=True)
+    - normalize="percent": Y în procente din fiecare grup (comparabil)
     - thresholds: valori verticale marcate (ex. chol 200/240; trestbps 130/140; oldpeak 1/2)
+    - patient_value: dacă e dat, trasează linie verticală pentru valoarea "pacientului"
     """
     _require_cols(df, [col, "has_disease"])
     x0 = df.loc[df["has_disease"] == 0, col].dropna().to_numpy()
@@ -108,21 +109,28 @@ def plot_hist_overlay(
         ax.hist(x1, bins=bins, alpha=0.6, label=f"Disease (n={len(x1)})", color=COLOR_DISEASE)
         ylabel = "Count"
 
-    # mediane
+    # mediane pe grupuri
     if show_medians:
-        m0 = float(np.median(x0))
-        m1 = float(np.median(x1))
+        m0 = float(np.median(x0)); m1 = float(np.median(x1))
         ax.axvline(m0, color=COLOR_HEALTHY, linestyle="--", linewidth=1)
         ax.axvline(m1, color=COLOR_DISEASE, linestyle="--", linewidth=1)
-        ax.text(m0, ax.get_ylim()[1]*0.95, f"med={m0:.1f}", color=COLOR_HEALTHY, fontsize=8, ha="right", va="top")
-        ax.text(m1, ax.get_ylim()[1]*0.95, f"med={m1:.1f}", color=COLOR_DISEASE, fontsize=8, ha="right", va="top")
+        ytop = ax.get_ylim()[1] * 0.95
+        ax.text(m0, ytop, f"med={m0:.1f}", color=COLOR_HEALTHY, fontsize=8, ha="right", va="top")
+        ax.text(m1, ytop, f"med={m1:.1f}", color=COLOR_DISEASE, fontsize=8, ha="right", va="top")
 
     # praguri
     _draw_thresholds(ax, thresholds)
 
+    # marker pentru "pacient"
+    if patient_value is not None:
+        ax.axvline(float(patient_value), color="black", linewidth=2.2)
+        ax.text(float(patient_value), ax.get_ylim()[1]*0.85, f"you={patient_value:.1f}",
+                rotation=90, ha="right", va="top", fontsize=9)
+
     ax.legend()
     finalize_axes(ax, title=f"Histogram Overlay — {col}", xlabel=col, ylabel=ylabel)
     return fig, ax
+
 
 
 def plot_box_by_outcome(

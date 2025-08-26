@@ -57,3 +57,44 @@ def disease_rate_by(df: pd.DataFrame, by: str) -> pd.DataFrame:
         "disease_rate_percent": (g.mean() * 100).round(2),
     }).reset_index()
     return out
+# --- simple "what-if" thresholds (no ML) ---
+
+DEFAULT_THRESHOLDS = {
+    "chol": (200.0, 240.0),     # normal <200, borderline 200–239, high >=240
+    "trestbps": (130.0, 140.0), # normal <130, borderline 130–139, high >=140
+    "oldpeak": (1.0, 2.0),      # normal <1, borderline 1–1.99, high >=2
+    # poți extinde după nevoi
+}
+
+def bucket_by_thresholds(value: float, low: float, high: float) -> str:
+    """Returnează 'normal' / 'borderline' / 'high' pe baza pragurilor."""
+    if value < low: return "normal"
+    if value < high: return "borderline"
+    return "high"
+
+def evaluate_patient_simple(values: dict, thresholds: dict | None = None) -> dict:
+    """
+    Evaluează un "pacient" (fără ML), doar pe baza pragurilor.
+    values: ex. {"chol": 245, "trestbps": 138, "oldpeak": 1.2, "age": 54, "thalach": 150}
+    thresholds: dict ca DEFAULT_THRESHOLDS (se pot override-ui pragurile).
+    Returnează un dict cu status per variabilă + un rezumat.
+    """
+    th = DEFAULT_THRESHOLDS if thresholds is None else thresholds
+    results = {}
+    flags_high = 0
+    flags_border = 0
+
+    for k, v in values.items():
+        if k in th and v is not None:
+            low, high = th[k]
+            status = bucket_by_thresholds(float(v), float(low), float(high))
+            results[k] = {"value": float(v), "thresholds": (float(low), float(high)), "status": status}
+            if status == "high": flags_high += 1
+            elif status == "borderline": flags_border += 1
+
+    summary = {
+        "flags_high": flags_high,
+        "flags_borderline": flags_border,
+        "note": "This is not a medical diagnosis. Thresholds are heuristic for visualization only."
+    }
+    return {"per_metric": results, "summary": summary}
