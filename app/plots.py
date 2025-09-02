@@ -225,3 +225,77 @@ def plot_box_by_outcome(
                 transform=ax.transAxes, ha="right", va="bottom", fontsize=8, alpha=0.75)
 
     return fig, ax
+def plot_corr_heatmap(df: pd.DataFrame, cols: list[str]):
+    """
+    Heatmap pentru matricea de corelație (Pearson) pe coloanele alese.
+    - tratează non-numerice/NaN implicit prin corr(numeric_only=True)
+    """
+    _require_cols(df, cols)
+    corr = df[cols].corr(numeric_only=True)
+
+    fig, ax = plt.subplots(figsize=(6.8, 5.2))
+    im = ax.imshow(corr.values, vmin=-1, vmax=1)
+    ax.set_xticks(range(len(cols)))
+    ax.set_yticks(range(len(cols)))
+    ax.set_xticklabels(cols, rotation=45, ha="right")
+    ax.set_yticklabels(cols)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.ax.set_ylabel("Pearson r", rotation=270, labelpad=10)
+    finalize_axes(ax, title="Correlation Matrix")
+    return fig, ax
+
+
+def plot_scatter_with_trend(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    color_by: str = "has_disease",
+    degree: int = 1,  # 1 = linie, 2 = polinom
+    show_r2: bool = True,
+):
+    """
+    Scatter x vs y + linie/polinom de trend (NumPy polyfit).
+    - colorează după `color_by` (ex: has_disease) dacă există
+    - afișează ecuația și R² pe datele curate (dropna)
+    """
+    need = [x, y]
+    if color_by:
+        need.append(color_by)
+    _require_cols(df, need)
+
+    dplot = df[[x, y] + ([color_by] if color_by else [])].dropna()
+    if len(dplot) < 2:
+        raise ValueError("Not enough data points after dropna for scatter.")
+
+    fig, ax = plt.subplots(figsize=(6.8, 4.6))
+
+    # 1) puncte (colorate pe categorii dacă e cazul)
+    if color_by:
+        for val, sub in dplot.groupby(color_by):
+            c = COLOR_HEALTHY if (val == 0 or str(val).lower() in {"0","healthy"}) else COLOR_DISEASE
+            ax.scatter(sub[x].values, sub[y].values, alpha=0.75, label=f"{color_by}={val}", s=18, edgecolors="none", c=c)
+        ax.legend()
+    else:
+        ax.scatter(dplot[x].values, dplot[y].values, alpha=0.75, s=18, edgecolors="none")
+
+    # 2) linia/polinomul de trend pe tot setul curat
+    X = dplot[x].values
+    Y = dplot[y].values
+    deg = max(1, min(3, int(degree)))
+    coef = np.polyfit(X, Y, deg=deg)
+    p = np.poly1d(coef)
+    xs = np.linspace(X.min(), X.max(), 200)
+    ax.plot(xs, p(xs), linewidth=2)
+
+    # R^2
+    if show_r2:
+        yhat = p(X)
+        ss_res = float(np.sum((Y - yhat) ** 2))
+        ss_tot = float(np.sum((Y - np.mean(Y)) ** 2))
+        r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else np.nan
+        eq = " + ".join([f"{c:.3g}·x^{i}" for i, c in zip(range(deg, -1, -1), coef)])
+        ax.text(0.02, 0.98, f"{eq}\nR² = {r2:.3f}", transform=ax.transAxes,
+                ha="left", va="top", fontsize=9)
+
+    finalize_axes(ax, title=f"Scatter with Trend: {x} vs {y}", xlabel=x, ylabel=y)
+    return fig, ax
