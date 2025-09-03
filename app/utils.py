@@ -10,13 +10,18 @@ OUTCOME_LABELS = {
     4: "Stage 4",
 }
 
+def _sex_to_label(s: pd.Series) -> pd.Categorical:
+    v = s.astype(str).str.strip().str.lower()
+    female_mask = v.isin(["0", "f", "female"])
+    male_mask   = v.isin(["1", "m", "male"])
+
+    label = pd.Series(index=s.index, dtype="object")
+    label[female_mask] = "Female"
+    label[male_mask]   = "Male"
+    label[~(female_mask | male_mask)] = "Unknown"
+    return pd.Categorical(label, categories=["Female", "Male", "Unknown"], ordered=True)
+
 def add_helper_columns(df: pd.DataFrame, add_label: bool = True) -> pd.DataFrame:
-    """
-    Add columns used throughout the app:
-      - has_disease: 1 if num>0 else 0
-      - age_bin: ≤50, 51–60, >60 (categorică ordonată)
-      - num_label: eticheta text pentru num (opțional)
-    """
     out = df.copy()
     out["has_disease"] = (out["num"] > 0).astype(int)
     out["age_bin"] = pd.cut(
@@ -26,9 +31,15 @@ def add_helper_columns(df: pd.DataFrame, add_label: bool = True) -> pd.DataFrame
         right=True,
         include_lowest=True,
     )
+
+    # === NEW: sex_label dacă există coloana 'sex' ===
+    if "sex" in out.columns:
+        out["sex_label"] = _sex_to_label(out["sex"])
+
     if add_label:
         out["num_label"] = out["num"].map(OUTCOME_LABELS).astype("category")
     return out
+
 
 def outcome_summary(df: pd.DataFrame) -> pd.DataFrame:
     """
