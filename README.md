@@ -60,10 +60,14 @@ cardioviz/
 │   ├── report.py        # PdfPages: build multi-page report
 │   ├── dataio.py        # load UCI/local, save session (JSON)
 │   ├── figutils.py      # figures generation
-│   └── utils.py         # binning, summary tables, outcome mapping
-├── templates/           # HTML templates (Jinja2)
-│   ├── index.html
-│   └── plot.html
+│   ├── utils.py         # binning, summary tables, outcome mapping
+│   └──templates/           # HTML templates (Jinja2)
+│       ├── base.html
+│       ├── index.html
+│       ├── explore.html
+│       ├── subgroups.html
+│       ├── whatif.html
+│       └── export.html
 ├── static/              # CSS, JS, generated PNGs
 │   ├──plots/
 ├── analysis/
