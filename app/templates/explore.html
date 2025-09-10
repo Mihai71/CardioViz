@@ -1,6 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Explore Data{% endblock %}
+
 {% block content %}
-<h1 class="mb-4">Explore Data</h1>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vel massa ut urna feugiat tincidunt. Integer sed sapien eu nulla porta facilisis.</p>
+<div class="container mt-4">
+
+  <h2 class="text-primary">Class Distribution</h2>
+  <p>
+    Primul pas în analiza datelor este să vedem cum sunt distribuite cazurile
+    între indivizii sănătoși (<code>num=0</code>) și diferitele stadii de severitate
+    ale bolii cardiace (<code>num=1–4</code>).
+  </p>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/dist_num.png') }}"
+           alt="Class Distribution" class="img-fluid mb-3">
+      <p class="text-muted small">
+        Se observă că peste jumătate dintre pacienți sunt sănătoși (54%),
+        în timp ce restul se împart între stadiile 1–4 cu ponderi mai mici.
+      </p>
+    </div>
+  </div>
+
+</div>
 {% endblock %}

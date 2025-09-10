@@ -1,58 +1,70 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}CardioViz{% endblock %}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      padding-top: 70px; /* ca navbar-ul fix să nu acopere conținutul */
-    }
-    .navbar-brand {
-      font-weight: bold;
-      font-size: 1.3rem;
-      letter-spacing: 1px;
-    }
-    .nav-link {
-      font-size: 1.1rem;
-    }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}CardioViz{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {
+        background-color: #f8fafc;
+        font-family: "Segoe UI", Roboto, sans-serif;
+      }
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      .navbar-brand {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+      h1, h2, h3 {
+        color: #0d6efd;
+      }
+      footer {
+        margin-top: 4rem;
+        padding: 1rem 0;
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">CardioViz</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav" aria-controls="navbarNav" 
+                aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('explore') }}">Explore</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('subgroups') }}">Subgroups</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('whatif') }}">What-if</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('export') }}">Export</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ url_for('index') }}">❤️ CardioViz</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('subgroups') }}">Subgroups</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('whatif') }}">What-if</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('export') }}">Export</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+    <!-- Content -->
+    <main class="container my-5">
+      {% block content %}{% endblock %}
+    </main>
 
-<div class="container">
-  {% block content %}
-  {% endblock %}
-</div>
+    <footer>
+      © 2025 CardioViz – Exploratory Heart Disease Analysis
+    </footer>
 
-<script src="https://cdn.jsdel
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

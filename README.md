@@ -61,6 +61,9 @@ cardioviz/
 │   ├── dataio.py        # load UCI/local, save session (JSON)
 │   ├── figutils.py      # figures generation
 │   ├── utils.py         # binning, summary tables, outcome mapping
+│   ├── static           # all generated graphs
+│   │   └── plots/
+│   │       └── patient/
 │   └──templates/           # HTML templates (Jinja2)
 │       ├── base.html
 │       ├── index.html
