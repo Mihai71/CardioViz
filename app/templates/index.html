@@ -1,11 +1,47 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>CardioViz Home</title>
-</head>
-<body>
-  <h1>Welcome to CardioViz!</h1>
-  <p>Lorem ipsum — pagina ta de start merge ✅</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}CardioViz - Home{% endblock %}
+
+{% block content %}
+<div class="text-center my-5">
+  <h1 class="display-4 fw-bold text-primary">❤️ CardioViz</h1>
+  <p class="lead text-muted">Exploratory and Clinical-style Analytics for Heart Disease Data</p>
+  <a href="{{ url_for('explore') }}" class="btn btn-lg btn-primary mt-3">Start Exploring</a>
+</div>
+
+<hr class="my-5">
+
+<div class="row text-center">
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title text-primary">📊 Explore Data</h5>
+        <p class="card-text">Visualize patient features, distributions, and relationships with interactive plots.</p>
+        <a href="{{ url_for('explore') }}" class="btn btn-outline-primary btn-sm">Go to Explore</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title text-primary">👥 Subgroups</h5>
+        <p class="card-text">Break down the dataset by sex, age, and disease stage to see subgroup patterns.</p>
+        <a href="{{ url_for('subgroups') }}" class="btn btn-outline-primary btn-sm">Go to Subgroups</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title text-primary">⚙️ What-if</h5>
+        <p class="card-text">Adjust thresholds and simulate clinical scenarios with interactive sliders.</p>
+        <a href="{{ url_for('whatif') }}" class="btn btn-outline-primary btn-sm">Try What-if</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="text-center my-5">
+  <a href="{{ url_for('export') }}" class="btn btn-success btn-lg">📥 Export Reports</a>
+</div>
+{% endblock %}
