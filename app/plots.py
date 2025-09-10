@@ -299,3 +299,172 @@ def plot_scatter_with_trend(
 
     finalize_axes(ax, title=f"Scatter with Trend: {x} vs {y}", xlabel=x, ylabel=y)
     return fig, ax
+
+STAGE_COLORS = {
+    0: "#4C78A8",  # Healthy (aceeași cu COLOR_HEALTHY)
+    1: "#F58518",
+    2: "#E45756",
+    3: "#72B7B2",
+    4: "#54A24B",
+}
+STAGE_LABELS = {0: "Healthy", 1: "Stage 1", 2: "Stage 2", 3: "Stage 3", 4: "Stage 4"}
+
+_UNIT_LABELS = {
+    "age": "years",
+    "trestbps": "mmHg",
+    "chol": "mg/dL",
+    "thalach": "bpm",
+    "oldpeak": "ST depression",
+}
+def _ylabel_for(col: str) -> str:
+    u = _UNIT_LABELS.get(col)
+    return f"{col} ({u})" if u else col
+
+
+def plot_stage_boxplots(df: pd.DataFrame, col: str, include_healthy: bool = True, min_n_warn: int = 5):
+    """
+    Boxplot-uri pentru `col` pe stadii (num=1..4) și opțional Healthy (0).
+    Returnează (fig, ax).
+    """
+    _require_cols(df, [col, "num"])
+    # ordinea stadiilor pe X
+    stages = [0, 1, 2, 3, 4] if include_healthy else [1, 2, 3, 4]
+
+    data = []
+    labels = []
+    counts = []
+    for s in stages:
+        vals = df.loc[df["num"] == s, col].dropna().to_numpy()
+        if len(vals) == 0:
+            # punem o listă goală ca să păstrăm poziția; vom sari la boxplot dacă toate sunt goale
+            data.append(np.array([]))
+        else:
+            data.append(vals)
+        labels.append(STAGE_LABELS.get(s, str(s)))
+        counts.append(len(vals))
+
+    if all(len(a) == 0 for a in data):
+        raise ValueError(f"No data for '{col}' across the requested stages.")
+
+    fig, ax = plt.subplots(figsize=(7.2, 4.6))
+    bp = ax.boxplot(
+        [a for a in data if len(a) > 0],
+        positions=[i for i, a in enumerate(data) if len(a) > 0],
+        labels=[lab for lab, a in zip(labels, data) if len(a) > 0],
+        showfliers=False,
+        patch_artist=True,
+    )
+
+    # colorează box-urile după stadiu (respectând pozițiile rămase)
+    pos_idx = 0
+    for i, (lab, a) in enumerate(zip(labels, data)):
+        if len(a) == 0:
+            continue
+        # mapăm înapoi la num (inverse lookup din STAGE_LABELS)
+        num_val = next((k for k, v in STAGE_LABELS.items() if v == lab), None)
+        c = STAGE_COLORS.get(num_val, "#999999")
+        bp["boxes"][pos_idx].set_facecolor(c)
+        bp["boxes"][pos_idx].set_alpha(0.6)
+        pos_idx += 1
+
+    # n sub fiecare box (folosim coordonate ale axei X)
+    for i, (n, a) in enumerate(zip(counts, data)):
+        if len(a) == 0:
+            continue
+        ax.text(i, -0.08, f"n={n}", transform=ax.get_xaxis_transform(),
+                ha="center", va="top", fontsize=9)
+
+    # avertisment pentru N mic
+    small = [lab for lab, n in zip(labels, counts) if n < min_n_warn and lab != "Healthy"]
+    if small:
+        ax.text(0.98, 0.02, f"Caution: low N in {', '.join(small)}",
+                transform=ax.transAxes, ha="right", va="bottom", fontsize=8, alpha=0.75)
+
+    finalize_axes(ax, title=f"Stage-wise Boxplots — {col}", ylabel=_ylabel_for(col))
+    return fig, ax
+
+
+def plot_subgroup_rate_bars(df: pd.DataFrame, by: str, outcome: str = "has_disease"):
+    """
+    Bar chart pentru rata de boală (%) pe subgrupuri.
+    by: 'age_bin' sau 'sex_label' (dacă există) etc.
+    """
+    _require_cols(df, [by, outcome])
+    dsub = df[[by, outcome]].dropna(subset=[by])
+    if len(dsub) == 0:
+        raise ValueError(f"No data to plot for subgroup '{by}'.")
+
+    # ordinea nivelurilor
+    if pd.api.types.is_categorical_dtype(dsub[by]):
+        levels = [lvl for lvl in dsub[by].cat.categories]
+    else:
+        levels = sorted(dsub[by].unique().tolist())
+
+    rates = []
+    counts = []
+    for lvl in levels:
+        sub = dsub.loc[dsub[by] == lvl, outcome]
+        if len(sub) == 0:
+            rates.append(np.nan); counts.append(0)
+        else:
+            rates.append(float(sub.mean() * 100.0))
+            counts.append(int(sub.size))
+
+    fig, ax = plt.subplots(figsize=(6.8, 4.4))
+    x = np.arange(len(levels))
+    bars = ax.bar(x, rates, color="#F58518", alpha=0.85)  # culoarea "Disease"
+
+    # etichete n și % pe fiecare bară
+    for xi, b, r, n in zip(x, bars, rates, counts):
+        ax.text(xi, b.get_height(), f"{r:.1f}%\n(n={n})", ha="center", va="bottom", fontsize=9)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([str(l) for l in levels])
+    ax.set_ylim(0, 100)
+    finalize_axes(ax, title=f"Disease rate by {by}", ylabel="Percent (%)")
+    return fig, ax
+
+
+def plot_stage_distribution_by_group(df: pd.DataFrame, by: str):
+    """
+    Stacked bars: distribuția stadiilor num=0..4 în fiecare subgrup `by`.
+    Axa Y în procente (0..100).
+    """
+    _require_cols(df, [by, "num"])
+    dsub = df[[by, "num"]].dropna(subset=[by])
+    if len(dsub) == 0:
+        raise ValueError(f"No data to plot for subgroup '{by}'.")
+
+    # ordinea nivelurilor pentru 'by'
+    if pd.api.types.is_categorical_dtype(dsub[by]):
+        levels = [lvl for lvl in dsub[by].cat.categories]
+    else:
+        levels = sorted(dsub[by].unique().tolist())
+
+    # tabel proporții pe stadii (0..4) în fiecare nivel din 'by'
+    tab = (
+        dsub.groupby(by)["num"]
+            .value_counts(normalize=True)  # proporții
+            .unstack(fill_value=0.0)
+            .reindex(index=levels, columns=[0, 1, 2, 3, 4], fill_value=0.0)
+    )
+
+    fig, ax = plt.subplots(figsize=(7.4, 4.8))
+    x = np.arange(len(levels))
+    bottom = np.zeros(len(levels), dtype=float)
+
+    handles = []
+    for s in [0, 1, 2, 3, 4]:
+        vals = (tab[s].values * 100.0)  # în procente
+        bars = ax.bar(x, vals, bottom=bottom, color=STAGE_COLORS.get(s, "#999999"), alpha=0.85, label=STAGE_LABELS[s])
+        bottom += vals
+        if s == 0:
+            handles.append(bars)  # doar ca să avem ceva pt legend (dar setăm explicit mai jos)
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([str(l) for l in levels])
+    ax.set_ylim(0, 100)
+    ax.legend([Patch(facecolor=STAGE_COLORS[s], alpha=0.85) for s in [0,1,2,3,4]],
+              [STAGE_LABELS[s] for s in [0,1,2,3,4]], loc="best")
+    finalize_axes(ax, title=f"Stage distribution by {by}", ylabel="Percent (%)")
+    return fig, ax
