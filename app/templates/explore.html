@@ -3,23 +3,147 @@
 {% block content %}
 <div class="container mt-4">
 
+  <h2 class="text-primary">Intro</h2>
+  <p>
+    When beginning an exploration of the dataset, it is useful to start with a broad overview. 
+    The very first question we want to answer is: how many of the patients are completely healthy, 
+    and how many already show signs of heart disease? By looking at this distribution, 
+    we set the stage for everything that follows. It gives us a sense of proportion, shows us how balanced (or imbalanced) 
+    the sample is, and helps us interpret later findings in the right context.
+  </p>
+
   <h2 class="text-primary">Class Distribution</h2>
   <p>
-    Primul pas în analiza datelor este să vedem cum sunt distribuite cazurile
-    între indivizii sănătoși (<code>num=0</code>) și diferitele stadii de severitate
-    ale bolii cardiace (<code>num=1–4</code>).
+    The chart below summarizes this outcome. 
+    Just over half of all patients are free of any heart disease, forming the largest single group. 
+    The rest of the population is spread across different levels of severity. 
+    The mildest form of disease is the most common among affected individuals, 
+    while the numbers gradually decrease as the severity increases. 
+    At the far end of the spectrum, only a handful of patients fall into the most severe category.
   </p>
 
   <div class="card shadow-sm mb-4">
     <div class="card-body text-center">
       <img src="{{ url_for('static', filename='plots/dist_num.png') }}"
            alt="Class Distribution" class="img-fluid mb-3">
-      <p class="text-muted small">
-        Se observă că peste jumătate dintre pacienți sunt sănătoși (54%),
-        în timp ce restul se împart între stadiile 1–4 cu ponderi mai mici.
-      </p>
     </div>
+    <p>
+      This uneven split carries an important message: 
+      most people in the dataset are either healthy or only slightly affected, 
+      while severe cases are quite rare. That means whenever we analyze risk factors, 
+      patterns, or subgroup differences, we should always keep in mind that the dataset does not treat each stage equally. 
+      The rarity of advanced disease makes it harder to generalize strong conclusions for those patients, 
+      but at the same time, it highlights how valuable their data is within the study.
+    </p>
+  </div>
+ 
+  <p>
+      After seeing the overall balance between healthy and affected patients, 
+      the natural question is: what makes these groups different? 
+      To answer this, we look at several clinical variables and compare their distributions
+      between healthy and diseased individuals. This allows us to identify patterns and possible risk factors
+      that tend to separate the two groups.
+  </p>
+
+  <h2 class="text-primary">Age</h2>
+  <p>
+    Age is one of the strongest and most intuitive risk factors for heart disease. 
+    In the chart, we can see that healthy individuals tend to be younger, with a median age of around 52. 
+    Patients with heart disease, on the other hand, cluster at older ages, with a median of 58. 
+    While there is still some overlap, the shift to the right for the disease group makes the age difference quite clear.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/hist_age.png') }}"
+           alt="Class Distribution" class="img-fluid mb-3">
+    </div>
+    <p>
+     In simple terms, the older the patient, the higher the chance of heart disease — 
+     a pattern that is already visible in this dataset.
+    </p>
   </div>
 
+    <h2 class="text-primary">Cholesterol</h2>
+  <p>
+    Cholesterol is another well-known risk factor. 
+    Both groups show a bell-shaped distribution, but the median value for patients with disease is slightly higher. 
+    What stands out is that very high cholesterol levels appear more often among those with disease than among healthy individuals.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/hist_chol.png') }}"
+           alt="Class Distribution" class="img-fluid mb-3">
+    </div>
+    <p>
+      This suggests that elevated cholesterol is more common in patients with heart disease, 
+      although the overlap shows it is not the only factor at play.
+    </p>
+  </div>
+
+  <h2 class="text-primary">ST depression</h2>
+  <p>
+    “Oldpeak” measures ST depression on an exercise ECG, which reflects possible ischemia. 
+    The chart shows a striking contrast: healthy patients are strongly concentrated near zero, 
+    while patients with disease have a broader spread, with a much higher median.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/hist_oldpeak.png') }}"
+           alt="Class Distribution" class="img-fluid mb-3">
+    </div>
+    <p>
+      This makes oldpeak one of the clearest markers separating healthy from diseased groups in this dataset.
+    </p>
+  </div>
+
+  <h2 class="text-primary">Maximum heart rate</h2>
+  <p>
+    Maximum heart rate achieved during exercise (thalach) is another important signal. 
+    Healthy individuals typically reach higher heart rates, with a median of about 161. 
+    Those with heart disease peak lower, around 142.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/hist_thalach.png') }}"
+           alt="Class Distribution" class="img-fluid mb-3">
+    </div>
+    <p>
+      The ability to reach a higher heart rate during exercise seems to be a protective factor, 
+      while lower peaks are more often linked to heart disease.
+    </p>
+  </div>
+
+  <h2 class="text-primary">Resting Blood Pressure</h2>
+  <p>
+    Resting blood pressure shows more overlap between groups compared to the other variables. 
+    Both healthy and diseased patients tend to cluster in the 120–140 range, 
+    though disease cases have a slightly higher median.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/hist_trestbps.png') }}"
+           alt="Class Distribution" class="img-fluid mb-3">
+    </div>
+    <p>
+      While elevated blood pressure is a known risk factor, in this dataset it does not separate the groups as sharply as age, 
+      cholesterol, or oldpeak.
+    </p>
+  </div>
+  <div>
+    <p>
+      Taken together, these histograms show that some variables provide a much clearer separation
+      between healthy and diseased patients than others. 
+      Age, maximum heart rate, cholesterol, and especially ST depression (oldpeak) stand out as strong indicators, 
+      with noticeable shifts between groups. In contrast, resting blood pressure, while still relevant, 
+      shows more overlap and therefore is less discriminative on its own.
+    </p>
+    <p>
+      The main takeaway is that heart disease does not depend on a single factor. 
+      Instead, it emerges from the combined influence of multiple clinical measurements. 
+      These first visual comparisons give us a sense of which features are more informative, 
+      and they prepare the ground for the next stage of the analysis, 
+      where we will explore categorical variables and relationships between predictors in more detail.
+    </p>
+  </div>
 </div>
 {% endblock %}
