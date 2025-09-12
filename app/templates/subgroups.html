@@ -1,8 +1,114 @@
 {% extends "base.html" %}
-{% block title %}Subgroups - CardioViz{% endblock %}
+
 {% block content %}
-<div class="card p-4">
-  <h1>Subgroup Analysis</h1>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec quam et urna efficitur laoreet non non nunc.</p>
+<div class="container mt-4">
+
+  <h2 class="text-primary">Intro</h2>
+  <p>
+    After exploring how individual variables differ between healthy and diseased patients, 
+    it is equally important to examine how the population is structured across meaningful subgroups. 
+    Age and sex are two of the most fundamental factors in medicine: 
+    they not only influence disease risk, but also help us understand 
+    how representative our dataset is, and whether there are imbalances 
+    that could affect the generalizability of conclusions.
+  </p>
+  <p>
+    In this section, we look at how heart disease stages are distributed by age and by sex, 
+    and we also calculate the overall rate of disease within these groups. 
+    This gives us a more concrete view of which parts of the population are most affected, 
+    and whether certain subgroups stand out as being particularly vulnerable. 
+  </p>
+
+  <h2 class="text-primary">Stage distribution by Age</h2>
+  <p>
+    The chart below shows the proportion of patients in each disease stage across three age brackets: 
+    younger patients (≤50), middle-aged (51–60), and older patients (>60). 
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/stage_dist_by_agebin.png') }}"
+           alt="Stage distribution by age" class="img-fluid mb-3">
+    </div>
+    <p>
+      Among younger patients, the majority are healthy, and only a small fraction reach more advanced stages. 
+      In the 51–60 group, the picture shifts: although healthy cases still dominate, 
+      there is a noticeable rise in mild and moderate stages of heart disease. 
+      For patients over 60, the distribution is more evenly spread, 
+      with a higher share of moderate and severe cases than in younger groups. 
+      This progression reflects the cumulative effect of risk factors over time: 
+      age remains one of the strongest drivers of disease severity.
+    </p>
+  </div>
+
+  <h2 class="text-primary">Stage distribution by Sex</h2>
+  <p>
+    Next, we compare disease stages between men and women. 
+    Biological differences, combined with lifestyle factors, 
+    often result in different risk profiles between the sexes.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/stage_dist_by_sex.png') }}"
+           alt="Stage distribution by sex" class="img-fluid mb-3">
+    </div>
+    <p>
+      The contrast is clear: women in the dataset are predominantly healthy, 
+      and relatively few reach higher stages of disease. 
+      Men, by comparison, have a much larger share of affected individuals, 
+      spread across all levels of severity. 
+      This suggests that male patients are more vulnerable in this population, 
+      which is consistent with findings from broader epidemiological studies.
+    </p>
+  </div>
+
+  <h2 class="text-primary">Disease Rate by Age</h2>
+  <p>
+    Beyond the stage breakdown, we can also look at the simple presence or absence of disease within each age group. 
+    This allows us to summarize the overall risk in a more intuitive way.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/subgroup_rate_agebin.png') }}"
+           alt="Disease rate by age" class="img-fluid mb-3">
+    </div>
+    <p>
+      The numbers confirm the pattern observed earlier: 
+      disease is least common among patients under 50 (about one in three). 
+      In the 51–60 group, risk rises to around half the population. 
+      Among those older than 60, more than half are already affected. 
+      This steady rise across age brackets underlines the strong and persistent effect of aging 
+      as a determinant of heart disease risk.
+    </p>
+  </div>
+
+  <h2 class="text-primary">Disease Rate by Sex</h2>
+  <p>
+    Similarly, we can summarize disease prevalence by sex. 
+    This chart condenses the distribution into a single percentage for each group.
+  </p>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+      <img src="{{ url_for('static', filename='plots/subgroup_rate_sex.png') }}"
+           alt="Disease rate by sex" class="img-fluid mb-3">
+    </div>
+    <p>
+      Here, the difference is striking: only about a quarter of women in the dataset are affected, 
+      compared to more than half of men. 
+      This reinforces the earlier observation from the stage distribution: 
+      male patients face a higher overall burden of heart disease in this population.
+    </p>
+  </div>
+
+  <h2 class="text-primary">Conclusion</h2>
+  <p>
+    Taken together, these subgroup analyses paint a consistent picture: 
+    heart disease risk increases significantly with age and is substantially higher among men than women. 
+    The progression across age brackets highlights the cumulative impact of risk factors, 
+    while the sex difference points to both biological and lifestyle contributors. 
+    These findings remind us that when analyzing predictors or designing interventions, 
+    subgroup differences must always be kept in mind. 
+    They not only explain variation in the data, but also guide us towards more personalized approaches to prevention and treatment.
+  </p>
+
 </div>
 {% endblock %}
